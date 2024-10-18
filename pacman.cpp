@@ -1,7 +1,11 @@
+#ifdef _WIN32
+    #include <conio.h>
+    #include <Windows.h>
+    #include <Winuser.h>
+#else
+// UNIX-like code (macOS and Linux)
+#endif
 #include <iostream>
-#include <conio.h>
-#include <Windows.h>
-#include <Winuser.h>
 #include <time.h>
 #include <thread>
 #include <string>
@@ -129,7 +133,11 @@ int main(){
         cen_out_ga(ll);
         cout<<'\n';
         cout<<flush;
-        Sleep(1000);
+        #ifdef _WIN32
+            Sleep(1000);
+        #else
+            usleep(1000*1000);
+        #endif
         // round_num++;
     }
     system("cls");

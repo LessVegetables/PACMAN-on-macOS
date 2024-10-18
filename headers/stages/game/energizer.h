@@ -1,8 +1,14 @@
 #pragma once
 #include <iostream>
-#include <conio.h>
-#include <Windows.h>
-#include <Winuser.h>
+#ifdef _WIN32
+    #include <conio.h>
+    #include <Windows.h>
+    #include <Winuser.h>
+#else
+// UNIX-like code (macOS and Linux)
+    #include <ncurses.h>
+    #include <unistd.h>
+#endif
 #include <time.h>
 #include <thread>
 #include <string>
@@ -31,7 +37,11 @@ void energizer_timer(){
             energCol++;
             energCol=energCol%2;
         }
-        Sleep(morg);
+        #ifdef _WIN32
+            Sleep(morg);
+        #else
+            usleep(morg*1000);
+        #endif
     }
 
     // Sleep(energizerSleep*7/10);

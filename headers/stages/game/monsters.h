@@ -1,8 +1,14 @@
 #pragma once
 #include <iostream>
-#include <conio.h>
-#include <Windows.h>
-#include <Winuser.h>
+#ifdef _WIN32
+    #include <conio.h>
+    #include <Windows.h>
+    #include <Winuser.h>
+#else
+// UNIX-like code (macOS and Linux)
+    #include <ncurses.h>
+    #include <unistd.h>
+#endif
 #include <time.h>
 #include <thread>
 #include <string>
@@ -619,11 +625,13 @@ void mon_thr(){
             mon_hard(hard_way);
         }
 
-
-        if(energAct) Sleep(wait_ghost_energizer);
-        else Sleep(wait_ghost_wo_ener);
-        
-
+        #ifdef _WIN32
+            if(energAct) Sleep(wait_ghost_energizer);
+            else Sleep(wait_ghost_wo_ener);
+        #else
+            if(energAct) usleep(wait_ghost_energizer*1000);
+            else usleep(wait_ghost_wo_ener*1000);
+        #endif
     }
 
 }

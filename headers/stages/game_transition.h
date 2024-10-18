@@ -1,8 +1,12 @@
 #pragma once
 #include <iostream>
-#include <conio.h>
-#include <Windows.h>
-#include <Winuser.h>
+#ifdef _WIN32
+    #include <conio.h>
+    #include <Windows.h>
+    #include <Winuser.h>
+#else
+// UNIX-like code (macOS and Linux)
+#endif
 #include <time.h>
 #include <thread>
 #include <string>
@@ -20,7 +24,6 @@ using namespace std;
 
 
 void transition(){
-
     for(int kt=2;kt>=0;kt--){
         updateScreen();
 
@@ -46,10 +49,10 @@ void transition(){
             
             
         }
-        Sleep(1000);
+        #ifdef _WIN32
+            Sleep(1000);
+        #else
+            usleep(1000*1000);
+        #endif
     }
-    
-
-    
-
 }

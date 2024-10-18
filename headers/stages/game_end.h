@@ -1,8 +1,15 @@
 #pragma once
 #include <iostream>
-#include <conio.h>
-#include <Windows.h>
-#include <Winuser.h>
+#ifdef _WIN32
+    #include <conio.h>
+    #include <Windows.h>
+    #include <Winuser.h>
+#else
+// UNIX-like code (macOS and Linux)
+    #include <ncurses.h>
+    #include <unistd.h>
+    #include <termios.h>
+#endif
 #include <time.h>
 #include <thread>
 #include <string>
@@ -20,7 +27,11 @@
 using namespace std;
 
 void leave(){
-    FlushConsoleInputBuffer(GetStdHandle(STD_INPUT_HANDLE) );
+    #ifdef _WIN32
+        FlushConsoleInputBuffer(GetStdHandle(STD_INPUT_HANDLE) );
+    #else
+        tcflush(STDIN_FILENO, TCIFLUSH);
+    #endif
     system("cls");
 
     cout<<BLU;

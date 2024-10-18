@@ -1,8 +1,12 @@
 #pragma once
 #include <iostream>
-#include <conio.h>
-#include <Windows.h>
-#include <Winuser.h>
+#ifdef _WIN32
+    #include <conio.h>
+    #include <Windows.h>
+    #include <Winuser.h>
+#else
+// UNIX-like code (macOS and Linux)
+#endif
 #include <time.h>
 #include <thread>
 #include <string>
@@ -32,7 +36,11 @@ string space_suf_del(string s){
 }
 
 void leader_board(string p_name){
-    FlushConsoleInputBuffer(GetStdHandle(STD_INPUT_HANDLE) );
+    #ifdef _WIN32
+        FlushConsoleInputBuffer(GetStdHandle(STD_INPUT_HANDLE) );
+    #else
+        tcflush(STDIN_FILENO, TCIFLUSH);
+    #endif
     ifstream fin;
     
     fin.open("leaderboard.txt");
@@ -46,9 +54,15 @@ void leader_board(string p_name){
         long long score;
         string rev=s;
         reverse(rev.begin(), rev.end());
-        auto tm=rev.find(' ');
-        if(tm==std::string::npos) continue;
-        int ind_sp=s.size()-tm-1;
+        #ifdef _WIN32
+            auto tm=rev.find(' ');
+            if(tm==std::string::npos) continue;
+            int ind_sp=s.size()-tm-1;
+        #else
+            auto a=rev.find(' ');
+            if(a==std::string::npos) continue;
+            int ind_sp=s.size()-a-1;
+        #endif
         name=s.substr(0, ind_sp);
         cout<<ind_sp<<" "<<name<<endl;
         try{

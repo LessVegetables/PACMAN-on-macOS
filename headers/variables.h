@@ -1,8 +1,12 @@
 #pragma once
 #include <iostream>
-#include <conio.h>
-#include <Windows.h>
-#include <Winuser.h>
+#ifdef _WIN32
+    #include <conio.h>
+    #include <Windows.h>
+    #include <Winuser.h>
+#else
+// UNIX-like code (macOS and Linux)
+#endif
 #include <time.h>
 #include <thread>
 #include <string>
@@ -50,17 +54,30 @@ const int he = 31;
 const int wi = 28;
 const int dop=2000;
 const int dcl=10000;
-atomic< int > curtime=0;
+
+#ifdef _WIN32
+    atomic< int > curtime=0;
+#else
+    atomic<int> curtime{0}; // Direct list initialization
+#endif
 const int cycle=dop+dcl;
 
 const int wait_ghost_energizer=550;
 const int start_wait_ghost=300;
 // atomic< int > wait_ghost;
-atomic< int > wait_ghost_wo_ener=start_wait_ghost;
-atomic< int > wait_gamer=150;
-atomic< double > ghost_speed_modifier=1.0;
-atomic< double > ghost_sp_mod_inc=0.05;
-atomic< int > round_num=1;
+#ifdef _WIN32
+    atomic< int > wait_ghost_wo_ener=start_wait_ghost;
+    atomic< int > wait_gamer=150;
+    atomic< double > ghost_speed_modifier=1.0;
+    atomic< double > ghost_sp_mod_inc=0.05;
+    atomic< int > round_num=1;
+#else
+    atomic< int > wait_ghost_wo_ener{start_wait_ghost};
+    atomic< int > wait_gamer{150};
+    atomic< double > ghost_speed_modifier{1.0};
+    atomic< double > ghost_sp_mod_inc{0.05};
+    atomic< int > round_num{1};
+#endif
 const double mon_sp_cap_mod=1.1;
 //40x61
 
@@ -79,8 +96,13 @@ const int mo_co=4;
 vector< bool > monplaced(mo_co+1, 0);
 int out_le=wi;// для центрирования вывода
 string mar_left=" | ";
-atomic< bool > gameContinue = true;
-atomic< int > death;//1 съеден монстром || -1 лив || 0 жив
+#ifdef _WIN32
+    atomic< bool > gameContinue = true;
+    atomic< int > death;//1 съеден монстром || -1 лив || 0 жив
+#else
+    atomic< bool > gameContinue{true};
+    atomic< int > death;//1 съеден монстром || -1 лив || 0 жив
+#endif
 int pix_char=8;
 int win_width=510;
 int win_height=800;
@@ -91,22 +113,38 @@ int char_wi=5;
 int col_k=0;
 string let_col[4]={BLU, RED, YEL, GRE};
 string num_col[3]={RED, YEL, GRE};
-atomic< bool > menuContinue = true;
+
+#ifdef _WIN32
+    atomic< bool > energAct=0;
+    atomic< int > energTime=0;
+    atomic< bool > menuContinue = true;
+#else
+    atomic< bool > energAct{0};
+    atomic< int > energTime{0};
+    atomic< bool > menuContinue{true};
+#endif
 int x_ch=2;//коэффицент растяжения букв по горизонтали (при изменение коэффицента с 2 все ломается :( )
 int y_ch=1;//коэффицент растяжения букв по вертикали
 int x_nu=5;
 int y_nu=3;
-atomic< bool > energAct=0;
-atomic< int > energTime=0;
+
 
 point se_mon_start;
 point fi_mon_start;
 point th_mon_start;
 point fo_mon_start;
-atomic< int > energCol=0;
+#ifdef _WIN32
+    atomic< int > energCol=0;
+#else
+    atomic< int > energCol{0};
+#endif
 string energColArr[2]={GRE, RED};
 const int morg=500;
-atomic< int > moncol=0;
+#ifdef _WIN32
+    atomic< int > moncol=0;
+#else
+    atomic< int > moncol{0};
+#endif
 string fi_mon_col[2]={BLU, RED};
 string se_mon_col[2]={BLU, CYA};
 string th_mon_col[2]={BLU, GRE};

@@ -1,8 +1,15 @@
 #pragma once
 #include <iostream>
-#include <conio.h>
-#include <Windows.h>
-#include <Winuser.h>
+#ifdef _WIN32
+    #include <conio.h>
+    #include <Windows.h>
+    #include <Winuser.h>
+#else
+// UNIX-like code (macOS and Linux)
+    #include <ncurses.h>
+    #include <unistd.h>
+    #include <termios.h>
+#endif
 #include <time.h>
 #include <thread>
 #include <string>
@@ -42,7 +49,11 @@ void threads_game(){
 }
 
 void var_reset(){
-    FlushConsoleInputBuffer(GetStdHandle(STD_INPUT_HANDLE) );
+    #ifdef _WIN32
+        FlushConsoleInputBuffer(GetStdHandle(STD_INPUT_HANDLE) );
+    #else
+        tcflush(STDIN_FILENO, TCIFLUSH);
+    #endif
     energAct=0;
     gam.i=17;
     gam.j=13;
@@ -71,37 +82,71 @@ void var_reset(){
 }
 
 void hideScrollBar(){
-    // убирает скролл бар
-    HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
-    CONSOLE_SCREEN_BUFFER_INFO scrBufferInfo;
-    GetConsoleScreenBufferInfo(hOut, &scrBufferInfo);
-    short winHeight = scrBufferInfo.srWindow.Bottom - scrBufferInfo.srWindow.Top + 1;
-    short scrBufferWidth = scrBufferInfo.dwSize.X;        
-    short scrBufferHeight = scrBufferInfo.dwSize.Y;        
-    COORD newSize;
-    newSize.X = scrBufferWidth;
-    newSize.Y = winHeight;
-    SetConsoleScreenBufferSize(hOut, newSize);
+
+    #ifdef _WIN32
+        // убирает скролл бар
+        HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+        CONSOLE_SCREEN_BUFFER_INFO scrBufferInfo;
+        GetConsoleScreenBufferInfo(hOut, &scrBufferInfo);
+        short winHeight = scrBufferInfo.srWindow.Bottom - scrBufferInfo.srWindow.Top + 1;
+        short scrBufferWidth = scrBufferInfo.dwSize.X;        
+        short scrBufferHeight = scrBufferInfo.dwSize.Y;        
+        COORD newSize;
+        newSize.X = scrBufferWidth;
+        newSize.Y = winHeight;
+        SetConsoleScreenBufferSize(hOut, newSize);
     //
+    #else
+        initscr();  // Start ncurses mode
+        noecho();   // Disable automatic echo of characters
+        cbreak();   // Disable line buffering
+
+        int height, width;
+        getmaxyx(stdscr, height, width);  // Get the current window size
+
+        resizeterm(height, width);  // Resize the terminal window to fit the screen
+        refresh();  // Refresh to apply changes
+
+        // Add your application logic here
+
+        endwin();  // End ncurses mode
+    #endif
 }
 
 void setWindowSize(){
-    // задает размер окна
-    HWND hwnd = GetConsoleWindow();
-    ShowScrollBar(hwnd, SB_BOTH, 0);
-    RECT ConsoleRect;
-    GetWindowRect(hwnd, &ConsoleRect);
-    MoveWindow(hwnd, ConsoleRect.left, ConsoleRect.top, win_width, win_height, TRUE);
-    //
+    #ifdef _WIN32
+        // задает размер окна
+        HWND hwnd = GetConsoleWindow();
+        ShowScrollBar(hwnd, SB_BOTH, 0);
+        RECT ConsoleRect;
+        GetWindowRect(hwnd, &ConsoleRect);
+        MoveWindow(hwnd, ConsoleRect.left, ConsoleRect.top, win_width, win_height, TRUE);
+        //
+    #else
+        initscr();  // Start ncurses mode
+        noecho();
+        // cbreak();
+        // Resize the terminal window to specific dimensions, e.g., 80x24
+        resizeterm(24, 80);
+        refresh();
+        // Your application logic goes here
+        endwin();  // End ncurses mode
+    #endif
 }
 
 void hideCursor(){
-    HANDLE hStdOut = NULL;
-    CONSOLE_CURSOR_INFO curInfo;
+    #ifdef _WIN32
+        HANDLE hStdOut = NULL;
+        CONSOLE_CURSOR_INFO curInfo;
 
-    hStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
-    GetConsoleCursorInfo(hStdOut, &curInfo);
-    curInfo.bVisible = FALSE;
-    SetConsoleCursorInfo(hStdOut, &curInfo);
+        hStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
+        GetConsoleCursorInfo(hStdOut, &curInfo);
+        curInfo.bVisible = FALSE;
+        SetConsoleCursorInfo(hStdOut, &curInfo);
+    #else
+        initscr();                // Initialize ncurses mode
+        curs_set(0);              // Hide the cursor (0 = invisible, 1 = normal, 2 = very visible)
+        endwin();              // Uncomment if you want to end ncurses mode after hiding the cursor
+    #endif
 }
 

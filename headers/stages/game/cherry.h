@@ -1,8 +1,14 @@
 #pragma once
 #include <iostream>
-#include <conio.h>
-#include <Windows.h>
-#include <Winuser.h>
+#ifdef _WIN32
+    #include <conio.h>
+    #include <Windows.h>
+    #include <Winuser.h>
+#else
+// UNIX-like code (macOS and Linux)
+    #include <ncurses.h>
+    #include <unistd.h>
+#endif
 #include <time.h>
 #include <thread>
 #include <string>
@@ -18,7 +24,14 @@ using namespace std;
 void cherry_spawn(){
     
     while(gameContinue){
-        Sleep(cherrySpawn);
+        #ifdef _WIN32
+            Sleep(cherrySpawn);
+        #else
+        // UNIX-like code (macOS and Linux)
+            usleep(cherrySpawn*1000); // pauses for cherrySpawn seconds
+        #endif
+
+
         static std::uniform_int_distribution<int> uidi(1,he-2+1);
         static std::uniform_int_distribution<int> uidj(1,wi-2+1);
         int ib=uidi(rng);
@@ -38,7 +51,14 @@ void cherry_spawn(){
                 }
             }
         }
-        Sleep(cherrySleep);
+
+        #ifdef _WIN32
+            Sleep(cherrySpawn);
+        #else
+        // UNIX-like code (macOS and Linux)
+            usleep(cherrySpawn*1000);
+        #endif
+
         arr[cherryInd.i][cherryInd.j]=0;
         cherryInd=u;
     }

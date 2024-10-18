@@ -1,8 +1,12 @@
 #pragma once
 #include <iostream>
-#include <conio.h>
-#include <Windows.h>
-#include <Winuser.h>
+#ifdef _WIN32
+    #include <conio.h>
+    #include <Windows.h>
+    #include <Winuser.h>
+#else
+// UNIX-like code (macOS and Linux)
+#endif
 #include <time.h>
 #include <thread>
 #include <string>
@@ -103,7 +107,11 @@ void letters_print(){
 
 
     cout<<flush;
-    Sleep(500);
+    #ifdef _WIN32
+        Sleep(500);
+    #else
+        usleep(500*1000);
+    #endif
 
 }
 

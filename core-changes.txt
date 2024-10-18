@@ -1,0 +1,4 @@
+Sleep(x): x is in milliseconds.
+usleep(y): y is in microseconds.
+
+so: Sleep(x) = usleep(x * 1000)

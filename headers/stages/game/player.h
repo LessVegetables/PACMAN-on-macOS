@@ -1,8 +1,15 @@
 #pragma once
 #include <iostream>
-#include <conio.h>
-#include <Windows.h>
-#include <Winuser.h>
+#ifdef _WIN32
+    #include <conio.h>
+    #include <Windows.h>
+    #include <Winuser.h>
+#else
+// UNIX-like code (macOS and Linux)
+    #include <ncurses.h>
+    #include <unistd.h>
+    #include <termios.h>
+#endif
 #include <time.h>
 #include <thread>
 #include <string>
@@ -22,7 +29,12 @@ using namespace std;
 
 void input_key(){
     while(gameContinue){
-        FlushConsoleInputBuffer(GetStdHandle(STD_INPUT_HANDLE) );
+        #ifdef _WIN32
+            FlushConsoleInputBuffer(GetStdHandle(STD_INPUT_HANDLE) );
+        #else
+            tcflush(STDIN_FILENO, TCIFLUSH); // Clears the input buffer for the terminal.
+        #endif
+
         //0 вверх | 1 вправо | 2 вниз | 3 влево
         switch(getch()){
                 
@@ -128,7 +140,12 @@ void character(){
             dir=tmpdir;
         }
         else goDir(dir);
-        Sleep(wait_gamer);
+
+        #ifdef _WIN32
+            Sleep(wait_gamer);
+        #else
+            usleep(wait_gamer*1000);
+        #endif
     }
     return;
 }
